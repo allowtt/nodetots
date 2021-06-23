@@ -1,9 +1,52 @@
 import * as express from 'express'; //express는 export default가 없어서 * as 반드시 써줘야됨
 import {Request, Response, NextFunction} from 'express';
+import * as morgan from 'morgan';
+import * as cors from 'cors';
+import * as cookieParser from 'cookie-parser';
+import * as expressSession from 'express-session';
+import * as dotenv from 'dotenv';
+import * as passport from 'passport';
+import * as hpp from 'hpp';
+import * as helmet from 'helmet';
+
+dotenv.config();
 const app : express.Application = express();
 const prod : boolean = process.env.NODE_ENV === 'production';
+console.log(prod);
+app.set('port', prod ? process.env.PORT : 3065);
+if(prod) {
+    app.use(hpp());
+    app.use(helmet());
+    app.use(morgan('combined'));
+    app.use(cors({
+        origin: /nodebird\.com$/,
+        credentials: true,
+    }));
+} else {
+    app.use(morgan('dev'));
+    app.use(cors({
+        origin: true,
+        credentials: true,
+    }));
+}
 
-app.set('port', prod ? process.env.PORT : 3065)
+app.use('/', express.static('uploads'));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(expressSession({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET!,
+    cookie: {
+        httpOnly: true,
+        secure: false, //https -> true
+        domain: prod ? '.nodebird.com' : undefined
+    },
+    name: 'rnbck',
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.get('/', (req : Request, res : Response, next: NextFunction) => {   //타입 생략 가능 정확한 위치
     res.send('백엔드 정상 동작 확인');
 });
