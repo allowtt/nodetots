@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "strict": true, //엄격, 보통 true로
+        "lib" :["ES2015", "es2016", "es2017", "es2018", "es2019", "es2020", "DOM"],    //최신문법 다 사용할 수 있도록
+        "moduleResolution": "Node"  //클래식, 노드
+    }
+}
