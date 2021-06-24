@@ -1,9 +1,8 @@
 "use strict";
 exports.__esModule = true;
 var dotenv = require("dotenv");
-// const dotenv = require('dotenv');
 dotenv.config();
-exports["default"] = {
+var config = {
     "development": {
         "username": "root",
         "password": process.env.DB_PASSWORD,
@@ -26,3 +25,4 @@ exports["default"] = {
         "dialect": "mysql"
     }
 };
+exports["default"] = config;
