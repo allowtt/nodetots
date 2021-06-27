@@ -87,7 +87,11 @@ router.post('/logout', isLoggedIn, (req, res) => {
     });
     
 });
-
+interface IUser extends User{
+    PostCount: number;
+    FollowingCount: number;
+    FollowerCount: number;
+}
 router.get('/:id', async (req, res, next) => {
     try {
         const user = await User.findOne({
@@ -110,14 +114,30 @@ router.get('/:id', async (req, res, next) => {
         if (!user) {
             return res.status(404).send('no user');
         }
-        const jsonUser = user.toJSON() as User;
-        jsonUser.PostCount = jsonUser.Posts.length;
-        jsonUser.FollowingCount = jsonUser.Followings.length;
-        jsonUser.FollowerCount = jsonUser.Followers.length;
+        const jsonUser = user.toJSON() as IUser;
+        jsonUser.PostCount = jsonUser.Posts ? jsonUser.Posts.length : 0;
+        // jsonUser.PostCount = jsonUser.Posts!.length;
+        jsonUser.FollowingCount = jsonUser.Followings!.length;
+        jsonUser.FollowerCount = jsonUser.Followers!.length;
         return res.json(jsonUser);
     } catch (e) {
         console.error(e);
         return next(e);
     }
 });
+
+router.get('/:id/followings', isLoggedIn, async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: {id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0}
+        });
+        if(!user) {
+            return res.status(404).send('no user');
+        }
+        // const follwer = 
+    } catch (error) {
+        console.error(error);
+        return next(error)
+    }
+})
 export default router;
