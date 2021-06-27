@@ -16,6 +16,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.associate = void 0;
+// import exp = require('constants');
 var sequelize_1 = require("sequelize");
 var sequelize_2 = require("./sequelize");
 var Post = /** @class */ (function (_super) {

@@ -9,6 +9,7 @@ import * as passport from 'passport';
 import * as hpp from 'hpp';
 import * as helmet from 'helmet';
 import { sequelize } from './models';
+import userRouter from './routes/user';
 
 dotenv.config();
 const app : express.Application = express();
@@ -55,6 +56,7 @@ app.use(expressSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/user', userRouter);
 app.get('/', (req : Request, res : Response, next: NextFunction) => {   //타입 생략 가능 정확한 위치
     res.send('백엔드 정상 동작 확인');
 });

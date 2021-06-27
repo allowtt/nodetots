@@ -1,4 +1,4 @@
-import exp = require('constants');
+// import exp = require('constants');
 import {DataTypes, Model} from  'sequelize';
 import { dbType } from './index';
 import { sequelize } from './sequelize';

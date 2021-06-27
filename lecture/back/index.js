@@ -10,6 +10,7 @@ var passport = require("passport");
 var hpp = require("hpp");
 var helmet = require("helmet");
 var models_1 = require("./models");
+var user_1 = require("./routes/user");
 dotenv.config();
 var app = express();
 var prod = process.env.NODE_ENV === 'production';
@@ -54,6 +55,7 @@ app.use(expressSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/user', user_1["default"]);
 app.get('/', function (req, res, next) {
     res.send('백엔드 정상 동작 확인');
 });
