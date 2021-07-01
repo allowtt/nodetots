@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -58,39 +39,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 exports.__esModule = true;
-var passport_1 = __importDefault(require("passport"));
-var bcrypt = __importStar(require("bcrypt"));
-var passport_local_1 = require("passport-local");
+var express_1 = __importDefault(require("express"));
+var sequelize_1 = __importDefault(require("sequelize"));
+var image_1 = __importDefault(require("../models/image"));
+var post_1 = __importDefault(require("../models/post"));
 var user_1 = __importDefault(require("../models/user"));
-exports["default"] = (function () {
-    passport_1["default"].use('local', new passport_local_1.Strategy({
-        usernameField: 'userId',
-        passwordField: 'password'
-    }, function (userId, password, done) { return __awaiter(void 0, void 0, void 0, function () {
-        var user, result, err_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, user_1["default"].findOne({ where: { userId: userId } })];
-                case 1:
-                    user = _a.sent();
-                    if (!user) {
-                        return [2 /*return*/, done(null, false, { message: '존재하지 않는 사용자입니다!' })];
-                    }
-                    return [4 /*yield*/, bcrypt.compare(password, user.password)];
-                case 2:
-                    result = _a.sent();
-                    if (result) {
-                        return [2 /*return*/, done(null, user)];
-                    }
-                    return [2 /*return*/, done(null, false, { message: '비밀번호가 틀립니다.' })];
-                case 3:
-                    err_1 = _a.sent();
-                    console.error(err_1);
-                    return [2 /*return*/, done(err_1)];
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); }));
-});
+var router = express_1["default"].Router();
+router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var where, posts, err_1;
+    var _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 2, , 3]);
+                where = {};
+                if (parseInt(req.query.lastId, 10)) {
+                    where = {
+                        id: (_a = {},
+                            _a[sequelize_1["default"].Op.lt] = parseInt(req.query.lastId, 10),
+                            _a)
+                    };
+                }
+                return [4 /*yield*/, post_1["default"].findAll({
+                        where: where,
+                        include: [{
+                                model: user_1["default"],
+                                attributes: ['id', 'nickname']
+                            }, {
+                                model: image_1["default"]
+                            }, {
+                                model: user_1["default"],
+                                as: 'Likers',
+                                attributes: ['id']
+                            }, {
+                                model: post_1["default"],
+                                as: 'Retweet',
+                                include: [{
+                                        model: user_1["default"],
+                                        attributes: ['id', 'nickname']
+                                    }, {
+                                        model: image_1["default"]
+                                    }]
+                            }],
+                        order: [['createdAt', 'DESC']],
+                        limit: parseInt(req.query.limit, 10)
+                    })];
+            case 1:
+                posts = _b.sent();
+                return [2 /*return*/, res.json(posts)];
+            case 2:
+                err_1 = _b.sent();
+                console.error(err_1);
+                return [2 /*return*/, next(err_1)];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+exports["default"] = router;

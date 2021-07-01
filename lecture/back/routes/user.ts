@@ -126,18 +126,117 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
-router.get('/:id/followings', isLoggedIn, async (req, res, next) => {
+router.get<any, any, any, { limit: string, offset: string }>('/:id/followings', isLoggedIn, async (req, res, next) => {
     try {
         const user = await User.findOne({
-            where: {id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0}
+            where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0 },
         });
-        if(!user) {
-            return res.status(404).send('no user');
-        }
-        // const follwer = 
-    } catch (error) {
-        console.error(error);
-        return next(error)
+        if (!user) return res.status(404).send('no user');
+        const followings = await user.getFollowings({
+            attributes: ['id', 'nickname'],
+            limit: parseInt(req.query.limit as string, 10),
+            offset: parseInt(req.query.offset as string, 10),
+        })
+        return res.json(followings);
+    } catch (e) {
+        console.error(e);
+        return next(e);
     }
-})
+});
+
+router.get<any, any, any, { limit: string, offset: string }>('/:id/followers', isLoggedIn, async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: { id: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0 },
+        });
+        if (!user) return res.status(404).send('no user');
+        const followers = await user.getFollowers({
+            attributes: ['id', 'nickname'],
+            limit: parseInt(req.query.limit as string, 10),
+            offset: parseInt(req.query.offset as string, 10),
+        })
+        return res.json(followers);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.delete('/:id/follower', isLoggedIn, async (req, res, next) => {
+    try {
+        const me = await User.findOne({
+            where: { id: req.user!.id },
+        });
+        await me!.removeFollower(parseInt(req.params.id, 10));
+        res.send(req.params.id);
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+router.post('/:id/follow', isLoggedIn, async (req, res, next) => {
+    try {
+        const me = await User.findOne({
+            where: { id: req.user!.id },
+        });
+        await me!.addFollowing(parseInt(req.params.id, 10));
+        res.send(req.params.id);
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+router.delete('/:id/follow', isLoggedIn, async (req, res, next) => {
+    try {
+        const me = await User.findOne({
+            where: { id: req.user!.id },
+        });
+        await me!.removeFollowing(parseInt(req.params.id, 10));
+        res.send(req.params.id);
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+router.get('/:id/posts', async (req, res, next) => {
+    try {
+        const posts = await Post.findAll({
+          where: {
+            UserId: parseInt(req.params.id, 10) || (req.user && req.user.id) || 0,
+            RetweetId: null,
+          },
+          include: [{
+            model: User,
+            attributes: ['id', 'nickname'],
+          }, {
+            model: Image,
+          }, {
+            model: User,
+            as: 'Likers',
+            attributes: ['id'],
+          }],
+        });
+        res.json(posts);
+      } catch (e) {
+        console.error(e);
+        next(e);
+      }
+});
+
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
+    try {
+      await User.update({
+        nickname: req.body.nickname,
+      }, {
+        where: { id: req.user!.id },
+      });
+      res.send(req.body.nickname);
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
+  });
 export default router;

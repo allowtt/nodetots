@@ -1,8 +1,6 @@
-
-import * as passport from 'passport';
+import passport from 'passport';
 import * as bcrypt from 'bcrypt';
 import { Strategy } from 'passport-local';
-
 import User from '../models/user';
 
 export default () => {

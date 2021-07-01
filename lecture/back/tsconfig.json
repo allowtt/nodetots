@@ -1,13 +1,9 @@
-
-
 {
-    "compilerOptions": {
-      "strict": true,
-      "lib": ["es2020"],
-      "moduleResolution": "node",
-      "typeRoots": ["./types"],
-    //   "target": "ES6"
-    },
-    // "files": ["./index.ts", "./types/index.d.ts"]
-    
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["es2020"],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "typeRoots": ["./types"]
   }
+}

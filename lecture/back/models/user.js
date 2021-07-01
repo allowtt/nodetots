@@ -46,6 +46,11 @@ User.init({
     collate: 'utf8_general_ci'
 });
 var associate = function (db) {
+    db.User.hasMany(db.Post, { as: 'Posts' });
+    db.User.hasMany(db.Comment);
+    db.User.belongsToMany(db.Post, { through: 'Like', as: 'Liked' });
+    db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followers', foreignKey: 'followingId' });
+    db.User.belongsToMany(db.User, { through: 'Follow', as: 'Followings', foreignKey: 'followerId' });
 };
 exports.associate = associate;
 exports["default"] = User;

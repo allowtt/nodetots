@@ -14,10 +14,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 exports.associate = void 0;
 var sequelize_1 = require("sequelize");
-var sequelize_2 = require("./sequelize");
+var sequelize_2 = __importDefault(require("./sequelize"));
 var Image = /** @class */ (function (_super) {
     __extends(Image, _super);
     function Image() {
